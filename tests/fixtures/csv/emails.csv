@@ -1,0 +1,5 @@
+sender,recipient,title,content,sendAt,periodicity
+,dest1@foo.bar,Subject 1,Content 1,0,0
+,dest2@bar.foo,Subject 2,Content 1,0,0
+,dest3@bar.bar,Subject 3,Content 1,0,0
+,dest_test@foo.foo,Subject Test,Content Test,0,0

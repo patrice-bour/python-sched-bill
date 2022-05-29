@@ -1,23 +1,29 @@
-import logging
-from logging.config import dictConfig
-from . import config
 from flask import Flask
-from flask_pymongo import PyMongo
+import logging
+from . import config
 
 
-def create_app():
+def create_app(config_class=config.DevelopmentConfiguration):
     """Boilerplate for the Flask application"""
+
     app = Flask(__name__)
-    app.config.from_object(config.DevelopmentConfiguration)
-    dictConfig(app.config.get('LOG_CONFIG', {}))
-    log = logging.getLogger()
-    log.debug('Configuration loaded.')
+    app.config.from_object(config_class)
 
-    mongo = PyMongo(app)
-    log.debug('Database configuration loaded')
+    with app.app_context():
+        from . import log
+        from . import db
+        from . import views
 
-    @app.route('/')
-    def home():
-        return 'Working flask'
+        log.init()
+        logger = logging.getLogger()
+        logger.debug('Configuration loaded')
+        db.get_db()
+        logger.debug('Database connected')
+        views.load()
+        logger.debug('Routes initialized')
 
-    return app
+        return app
+
+
+if __name__ == '__main__':
+    create_app(config.DevelopmentConfiguration)
