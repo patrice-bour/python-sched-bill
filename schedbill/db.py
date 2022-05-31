@@ -42,7 +42,6 @@ logger = logging.getLogger()
 
 def get_db() -> MongoEngine:
     """Set or return the MongoEngine connection to the MongoDB driver"""
-
     if 'db' not in g:
         current_app.config['MONGODB_SETTINGS'] = {
             'host': current_app.config.get('DB_URI_FORMAT').format(
@@ -52,22 +51,26 @@ def get_db() -> MongoEngine:
                 db=current_app.config.get('DB_NAME')
             )
         }
-        g.db = MongoEngine(current_app)
+        try:
+            g.db = MongoEngine(current_app)
+        except Exception as exc:
+            logger.error(f"Can not connect to Mongo DB {str(exc)}")
     return g.db
 
 
 def connect_db(conf=config.DevelopmentConfiguration) -> MongoEngine:
     """"""
-
-    conn = mongoengine.connect(
-        host=conf.DB_URI_FORMAT.format(
-            user=conf.DB_USER,
-            secret=conf.DB_SECRET,
-            host=conf.DB_HOST,
-            db=conf.DB_NAME
-        )
+    conn = None
+    host_config = conf.DB_URI_FORMAT.format(
+        user=conf.DB_USER,
+        secret=conf.DB_SECRET,
+        host=conf.DB_HOST,
+        db=conf.DB_NAME
     )
-
+    try:
+        conn = mongoengine.connect(host=host_config)
+    except Exception as exc:
+        logger.error(f"Can not connect to Mongo DB {str(exc)}")
     return conn
 
 # monitoring.register(CommandLogger())

@@ -17,10 +17,6 @@ class UserModelTestCase(unittest.TestCase):
         for col in cls.raw_db.list_collection_names():
             cls.raw_db[col].drop()
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        cls.conn.close()
-
     def setUp(self) -> None:
         drop_collections(UserModelTestCase.raw_db)
         create_users(self, UserModelTestCase.raw_db)

@@ -18,10 +18,6 @@ class InvoiceModelTestCase(unittest.TestCase):
         for col in cls.raw_db.list_collection_names():
             cls.raw_db[col].drop()
 
-    @classmethod
-    def tearDownClass(cls) -> None:
-        cls.conn.close()
-
     def setUp(self) -> None:
         drop_collections(InvoiceModelTestCase.raw_db)
         create_invoices(self, InvoiceModelTestCase.raw_db)
