@@ -5,6 +5,7 @@ from . import errors
 from . import db
 from . import views
 from . import log
+from . import scheduler
 
 
 def create_app(config_class=config.DevelopmentConfiguration):
@@ -23,7 +24,8 @@ def create_app(config_class=config.DevelopmentConfiguration):
         logger.debug('Database connected')
         views.load()
         logger.debug('Routes initialized')
-
+        scheduler.load()
+        logger.debug('Scheduler initialized and started')
         return app
 
 

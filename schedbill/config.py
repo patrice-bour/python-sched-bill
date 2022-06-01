@@ -1,6 +1,7 @@
 """Flask configuration."""
 from dotenv import load_dotenv
 from os import environ, path
+import pytz
 
 app_dir = path.abspath(path.dirname(__file__))
 load_dotenv(path.join(app_dir, '.env'))
@@ -41,6 +42,9 @@ class Configuration:
     DB_SECRET = environ.get('DB_PASSWORD')
     DB_NAME = 'intiaDevDB'
     DB_URI_FORMAT = 'mongodb+srv://{user}:{secret}@{host}/{db}?retryWrites=true&w=majority'
+    SCHEDULER_MAX_THREADS = 20
+    SCHEDULER_JOB_COALESCE = False
+    SCHEDULER_TIMEZONE = pytz.utc
 
 
 class ProductionConfiguration(Configuration):
@@ -52,7 +56,7 @@ class DevelopmentConfiguration(Configuration):
     """Configuration for the development environment"""
     Configuration.LOG_CONFIG['root']['level'] = 'DEBUG'
     DB_NAME = 'intiaDevDB'
-
+    SCHEDULER_MAX_THREADS = 5
 
 class TestingConfiguration(Configuration):
     """Configuration for the development environment"""
@@ -85,3 +89,4 @@ class TestingConfiguration(Configuration):
             'propagate': True
         }
     }
+    SCHEDULER_MAX_THREADS = 5
