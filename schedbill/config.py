@@ -37,13 +37,16 @@ class Configuration:
             'propagate': True
         }
     }
+    APP_TIMEZONE = pytz.timezone('Europe/Paris')
     DB_HOST = 'cluster0.xdxzo.mongodb.net'
     DB_USER = environ.get('DB_USER')
     DB_SECRET = environ.get('DB_PASSWORD')
     DB_NAME = 'intiaDevDB'
     DB_URI_FORMAT = 'mongodb+srv://{user}:{secret}@{host}/{db}?retryWrites=true&w=majority'
     SCHEDULER_MAX_THREADS = 20
-    SCHEDULER_JOB_COALESCE = False
+    # False = missed executions can lead to multiple executions in a row later on. True = only one execution anyway.
+    SCHEDULER_JOB_COALESCE = True
+    SCHEDULER_MISFIRE_GRACE_TIME = None  # Run the late job no matter how late it is
     SCHEDULER_TIMEZONE = pytz.utc
 
 
@@ -57,6 +60,7 @@ class DevelopmentConfiguration(Configuration):
     Configuration.LOG_CONFIG['root']['level'] = 'DEBUG'
     DB_NAME = 'intiaDevDB'
     SCHEDULER_MAX_THREADS = 5
+
 
 class TestingConfiguration(Configuration):
     """Configuration for the development environment"""

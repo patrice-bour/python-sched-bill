@@ -3,6 +3,8 @@ from mongoengine import ValidationError, DoesNotExist
 from bson import ObjectId
 from bson.errors import InvalidId
 from models import User, EMail, Invoice
+from datetime import datetime
+import pytz
 import logging
 
 
@@ -107,6 +109,8 @@ class EMailController():
         """
 
         raw_email = request.get_json()
+        # Reckon sending time
+
         email = EMail(**raw_email)
         email.save()
 
@@ -141,6 +145,25 @@ class EMailController():
         email = EMail.objects.get(id=oid)
         email.delete()
 
+    @classmethod
+    def schedule_email(cls, email):
+        """"""
+
+        if email.sendAt > 0:
+            g.scheduler.add_job(cls.send_email(), '', args=email.id, id=email.id, replace_existing=True)
+        else:
+            try:
+                g.scheduler.remove_job(email.id)
+            except Exception as exc:
+                raise Exception(exc)
+
+
+    @classmethod
+    def send_email(cls, oid):
+        """"""
+
+        email = cls.find(oid)
+        logger.info(f"*** Sending email : {email.to_json()}")
 
 class InvoiceController():
     """"""
