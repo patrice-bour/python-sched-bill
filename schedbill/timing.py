@@ -18,7 +18,7 @@ class TimeCalc:
         :return: the corresponding timestamp
         """
         if str.isnumeric(str(date_arg)) or is_float(date_arg):
-            return datetime.utcfromtimestamp(int(date_arg))  # Let's get rid of microseconds if any
+            return int(datetime.utcfromtimestamp(int(date_arg)).timestamp())  # Let's get rid of microseconds if any
         human_time = pytz.timezone(TimeCalc.HUMAN_TZ).localize(parse(date_arg))
         store_time = human_time.astimezone(pytz.timezone(TimeCalc.STORE_TZ))
         return store_time.timestamp()
