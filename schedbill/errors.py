@@ -17,6 +17,13 @@ def load():
         logger.error(f"{request} Exception met : {str(e)}")
         return jsonify(error=f"Exception met : {str(e)}"), 500
 
+    @current_app.errorhandler(AttributeError)
+    def handle_exception(e):
+        """Generic Exception handler"""
+
+        logger.error(f"{request} Attribute error : {str(e)}")
+        return jsonify(error=f"Attribute error : {str(e)}"), 500
+
     @current_app.errorhandler(BadRequest)
     def handle_bad_request(e):
         """Bad Request handler"""
