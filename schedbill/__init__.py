@@ -1,11 +1,11 @@
-from flask import Flask
+from flask import Flask, g
 import logging
 from . import config
 from . import errors
-from . import db
 from . import views
 from . import log
-from . import scheduler
+from db import get_db
+from scheduler import get_scheduler
 
 
 def create_app(config_class=config.DevelopmentConfiguration):
@@ -20,12 +20,13 @@ def create_app(config_class=config.DevelopmentConfiguration):
         logger.debug('Configuration loaded')
         errors.load()
         logger.debug('Errors handlers loaded')
-        db.get_db()
+        get_db()
         logger.debug('Database connected')
+        app_scheduler = get_scheduler()
+        app_scheduler.start()
+        logger.debug('Scheduler initialized and started')
         views.load()
         logger.debug('Routes initialized')
-        scheduler.load()
-        logger.debug('Scheduler initialized and started')
         return app
 
 
