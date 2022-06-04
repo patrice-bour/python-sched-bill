@@ -9,14 +9,14 @@ import logging
 logger = logging.getLogger()
 
 
-def load():
+def load() -> None:
     """Setup routes using the Flask app context"""
 
     #
     # Home and static routes
     #
     @current_app.route('/')
-    def home():
+    def home() -> None:
         return 'The documentation would fit here'
 
     #
@@ -25,7 +25,7 @@ def load():
 
     # GET user by oid
     @current_app.route('/users/<string:oid>', methods=['GET'])
-    def get_user(oid):
+    def get_user(oid: str) -> (str, int):
         """This route retrieves a user using its _id"""
         user = UserController.find(oid)
         logger.debug(f"{request} responded with user with id '{oid}'")
@@ -33,7 +33,7 @@ def load():
 
     # GET user by email
     @current_app.route('/users/emailAddress/<string:email>', methods=['GET'])
-    def get_user_by_email(email):
+    def get_user_by_email(email: str) -> (str, int):
         """This route retrieves a user using its email address"""
         user = UserController.find_by_email(email)
         logger.debug(f"{request} responded with user with email '{email}'")
@@ -41,23 +41,23 @@ def load():
 
     # POST new user
     @current_app.route('/users', methods=['POST'])
-    def new_user():
+    def new_user() -> (str, int):
         """This route creates a new user in the database"""
-        user = UserController.create_user()
+        user = UserController.create_user(request.get_json())
         logger.debug(f"{request} successfully created a new user'")
         return jsonify(data=user), 201
 
     # PUT (update) user by oid
     @current_app.route('/users/<string:oid>', methods=['PUT'])
-    def update_user(oid):
+    def update_user(oid: str) -> (str, int):
         """This route updates a user, identified by its oid, in the database"""
-        user = UserController.update_user(oid)
+        user = UserController.update_user(oid, request.get_json())
         logger.debug(f"{request} successfully updated user with id {oid}'")
         return jsonify(data=user), 200
 
     # DELETE user by oid
     @current_app.route('/users/<string:oid>', methods=['DELETE'])
-    def delete_user(oid):
+    def delete_user(oid: str) -> (str, int):
         """This route deletes a user, identified by its oid, in the database"""
         UserController.delete_user(oid)
         logger.debug(f"{request} successfully deleted user with id {oid}'")
@@ -69,7 +69,7 @@ def load():
 
     # GET email by id
     @current_app.route('/emails/<string:oid>', methods=['GET'])
-    def get_email(oid):
+    def get_email(oid: str) -> (str, int):
         """This route retrieves an email using its _id"""
         email = EMailController.find(oid)
 
@@ -78,24 +78,24 @@ def load():
 
     # POST new email
     @current_app.route('/emails', methods=['POST'])
-    def new_email():
+    def new_email() -> (str, int):
         """This route creates a new email in the database"""
-        email = EMailController.create_email()
+        email = EMailController.create_email(request.get_json())
 
         logger.debug(f"{request} successfully created a new email'")
         return jsonify(data=email), 201
 
     # PUT (update) email by id
     @current_app.route('/emails/<string:oid>', methods=['PUT'])
-    def update_email(oid):
+    def update_email(oid: str) -> (str, int):
         """This route updates an email, identified by its id, in the database"""
-        email = EMailController.update_email(oid)
+        email = EMailController.update_email(oid, request.get_json())
         logger.debug(f"{request} successfully updated email with id {oid}'")
         return jsonify(data=email), 200
 
     # DELETE email by id
     @current_app.route('/emails/<string:oid>', methods=['DELETE'])
-    def delete_email(oid):
+    def delete_email(oid: str) -> (str, int):
         """This route deletes an email, identified by its id, in the database"""
         EMailController.delete_email(oid)
 
@@ -108,7 +108,7 @@ def load():
 
     # GET invoice by id
     @current_app.route('/invoices/<string:oid>', methods=['GET'])
-    def get_invoice(oid):
+    def get_invoice(oid: str) -> (str, int):
         """This route retrieves an invoice using its _id"""
         invoice = InvoiceController.find(oid)
 
@@ -117,24 +117,24 @@ def load():
 
     # POST new invoice
     @current_app.route('/invoices', methods=['POST'])
-    def new_invoice():
+    def new_invoice() -> (str, int):
         """This route creates a new invoice in the database"""
-        invoice = InvoiceController.create_invoice()
+        invoice = InvoiceController.create_invoice(request.get_json())
 
         logger.debug(f"{request} successfully created a new invoice'")
         return jsonify(data=invoice), 201
 
     # PUT (update) invoice by id
     @current_app.route('/invoices/<string:oid>', methods=['PUT'])
-    def update_invoice(oid):
+    def update_invoice(oid: str) -> (str, int):
         """This route updates an invoice, identified by its id, in the database"""
-        invoice = InvoiceController.update_invoice(oid)
+        invoice = InvoiceController.update_invoice(oid, request.get_json())
         logger.debug(f"{request} successfully updated invoice with id {id}'")
         return jsonify(data=invoice), 200
 
     # DELETE invoice by id
     @current_app.route('/invoices/<string:oid>', methods=['DELETE'])
-    def delete_invoice(oid):
+    def delete_invoice(oid: str) -> (str, int):
         """This route deletes an invoice, identified by its id, in the database"""
         InvoiceController.delete_invoice(oid)
         logger.debug(f"{request} successfully deleted invoice with id {id}'")
