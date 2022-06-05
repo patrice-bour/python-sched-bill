@@ -18,12 +18,19 @@ def create_invoices(test_instance, raw_db):
         invoice_rank = invoice_rank + 1
         random_id = randint(0, users_count-1)
         random_user = users_list[random_id]
-        random_user_id = random_user["_id"]['$oid']
+        random_sender_id = random_user["_id"]['$oid']
+        random_id = randint(0, users_count - 1)
+        random_user = users_list[random_id]
+        random_recipient_id = random_user["_id"]['$oid']
         raw_db.invoices.find_one_and_update(
             {"_id": ObjectId(invoice_csv["_id"]['$oid'])},
             {
-             '$set': {"sender": random_user_id}
+                '$set': {
+                    "sender": random_sender_id,
+                    "recipient": random_recipient_id
+                }
             }
         )
         invoice_csv_attr = getattr(test_instance, f"invoice{invoice_rank}_json")
-        invoice_csv_attr['sender'] = {'$oid': random_user_id}
+        invoice_csv_attr['sender'] = {'$oid': random_sender_id}
+        invoice_csv_attr['recipient'] = {'$oid': random_recipient_id}

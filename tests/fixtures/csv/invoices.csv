@@ -1,5 +1,5 @@
-sender,reference,periodicity,notify
-,abcd,0,False
-,efgh,0, False
-,ijkl, 0 ,False
-,test,0,False
+sender,recipient,reference,periodicity,notify,notifyAt
+,,abcd,0,False,0
+,,efgh,0, False,0
+,,ijkl, 0 ,False,0
+,,test,0,False,0
