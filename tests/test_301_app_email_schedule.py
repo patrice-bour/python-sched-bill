@@ -62,7 +62,7 @@ class EMailSchedulingTestApp(flask_unittest.AppTestCase):
             'sendAt': time_to_send
         })
 
-    def test_email_save_schedule(self, app: Flask):
+    def test_email_save_schedule(self, app: Flask) -> None:
         self.create_email(datetime.now().timestamp() + 10)
         try:
             sched_job = self.scheduler.get_job(str(self.email.id))
