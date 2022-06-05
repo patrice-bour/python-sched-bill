@@ -22,7 +22,7 @@ def create_from_csv_file(raw_db, document_name, test_instance):
             for k,v in row.items():
                 v = str.strip(v)
                 # Ugly trick to convert strings representing int to int
-                if str.isnumeric(v):
+                if str.isnumeric(v) or str(v).lstrip('-').isnumeric():
                     try:
                         v = int(v)
                     except (ValueError, TypeError):
@@ -31,9 +31,9 @@ def create_from_csv_file(raw_db, document_name, test_instance):
                 elif len(v) == 0 or str.isspace(v):
                     v = None
                 # Convert boolean string values
-                elif v == 'False':
+                elif v == 'False' or v == 'false':
                     v = False
-                elif v == 'True':
+                elif v == 'True' or v == 'true':
                     v = True
 
                 row[k] = v
