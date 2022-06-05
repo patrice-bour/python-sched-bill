@@ -1,39 +1,42 @@
-from flask import current_app, g
 from datetime import datetime
-from dateutil.parser import *
+from dateutil.parser import parse
 from helpers import is_float
 import pytz
 
 
 class TimeCalc:
-    """"""
-    HUMAN_TZ = 'Europe/Paris'
-    STORE_TZ = 'utc'
+    """This class provides class methods to ease timestamp and datetime conversions."""
 
     @classmethod
-    def convert_to_store(cls, date_arg):
-        """Convert the date argument to a timestamp as stored in the system
+    def arg_to_timestamp(cls, date_arg):
+        """Convert the argument to a timestamp, getting rid of microseconds if any
 
-        :param date_arg: a string representation of a date (could be a timestamp)
-        :return: the corresponding timestamp
+        :param date_arg: the date as a string or numeric, representing a parsable date or a timestamp
+        :return: the timestamp representation of the date
         """
-        if str.isnumeric(str(date_arg)) or is_float(date_arg):
-            return int(datetime.utcfromtimestamp(int(date_arg)).timestamp())  # Let's get rid of microseconds if any
-        human_time = pytz.timezone(TimeCalc.HUMAN_TZ).localize(parse(date_arg))
-        store_time = human_time.astimezone(pytz.timezone(TimeCalc.STORE_TZ))
-        return store_time.timestamp()
+
+        if isinstance(date_arg, datetime):  # the argument is a datetime
+            return int(date_arg.timestamp())
+        elif isinstance(date_arg, str):
+            if str.isnumeric(date_arg) :  # the argument is a string which represents a timestamp
+                return int(date_arg)
+            elif is_float(date_arg):  # the argument is a string which represents a timestamp with milliseconds
+                return int(float(date_arg))
+            else: # the argument is a string which has to represent a date and time
+                dtfs = parse(date_arg)
+                return int(dtfs.timestamp())
+        elif is_float(date_arg):  # the argument is already a timestamp
+            return int(date_arg)
+
 
     @classmethod
-    def convert_to_human(cls, date_arg):
-        """Convert the date argument to the timezone of the user
+    def timestamp_to_datetime(cls, ts, tz='utc'):
+        """Convert the timestamp argument to a datetime object with a timezone information
 
-        :param date_arg: a string representation of a date (could be a timestamp)
-        :return: the corresponding user's date
+        :param ts: the timestamp to convert
+        :param tz: the timezone to use for the conversion (default to UTC)
+        :return: the datetime object representing the timestamp converted in the destination timezone
         """
-        store_time = None
-        if str.isnumeric(str(date_arg)) or is_float(date_arg):
-            store_time = datetime.fromtimestamp(int(date_arg))  # Let's get rid of microseconds if any
-        else:
-            store_time = pytz.timezone(TimeCalc.STORE_TZ).localize(parse(date_arg))
-        human_time = store_time.astimezone(pytz.timezone(TimeCalc.HUMAN_TZ))
-        return human_time
+        local_date = datetime.fromtimestamp(ts)
+        target_tz = pytz.timezone(tz)
+        return local_date.astimezone(target_tz)
