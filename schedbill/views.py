@@ -1,8 +1,4 @@
 from flask import current_app, g, request, jsonify
-from mongoengine import ValidationError, DoesNotExist
-from bson import ObjectId
-from bson.errors import InvalidId
-from models import User, EMail, Invoice
 from controllers import UserController, EMailController, InvoiceController
 import logging
 
@@ -139,3 +135,12 @@ def load() -> None:
         InvoiceController.delete_invoice(oid)
         logger.debug(f"{request} successfully deleted invoice with id {id}'")
         return jsonify({}), 204
+
+    # Generate the invoice corresponding to the id
+    @current_app.route('/invoices/<string:oid>', methods=['POST'])
+    def generate_invoice(oid: str) -> (str, int):
+        """"""
+        invoice = InvoiceController.find(oid)
+        InvoiceController.generate_invoice(oid)
+        logger.debug(f"{request} successfully generated the invoice with id {oid}'")
+        return jsonify(data=invoice), 200
