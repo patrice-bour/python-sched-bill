@@ -31,6 +31,7 @@ class InvoiceModelTestCase(unittest.TestCase):
         """Test saving a Invoice model"""
         # Can save a valid invoice
         self.invoice_in_test_json.pop('sender')
+        self.invoice_in_test_json.pop('recipient')
         invoice = Invoice(**self.invoice_in_test_json)
         invoice.save()
         invoice_find = Invoice.objects.no_dereference().get(id=str(invoice.id))
@@ -49,7 +50,9 @@ class InvoiceModelTestCase(unittest.TestCase):
         """Test updating a Invoice model"""
         invoice = Invoice(**self.invoice_in_test_json)
         invoice.sender = ObjectId(self.invoice1_json['sender']['$oid'])
+        invoice.recipient = ObjectId(self.invoice1_json['recipient']['$oid'])
         self.invoice_in_test_json['sender'] = {'$oid': self.invoice1_json['sender']['$oid']}
+        self.invoice_in_test_json['recipient'] = {'$oid': self.invoice1_json['recipient']['$oid']}
         invoice.save()
         invoice_find = Invoice.objects.no_dereference().get(id=str(invoice.id))
         self.invoice_in_test_json['_id'] = { '$oid': str(invoice.id)}
@@ -63,7 +66,9 @@ class InvoiceModelTestCase(unittest.TestCase):
         """Test deleting a Invoice model"""
         invoice = Invoice(**self.invoice_in_test_json)
         invoice.sender = ObjectId(self.invoice1_json['sender']['$oid'])
+        invoice.recipient = ObjectId(self.invoice1_json['recipient']['$oid'])
         self.invoice_in_test_json['sender'] = {'$oid': self.invoice1_json['sender']['$oid']}
+        self.invoice_in_test_json['recipient'] = {'$oid': self.invoice1_json['recipient']['$oid']}
         invoice.save()
         invoice_id = str(invoice.id)
         self.invoice_in_test_json['_id'] = {'$oid': invoice_id}

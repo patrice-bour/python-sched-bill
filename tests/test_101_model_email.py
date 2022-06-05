@@ -22,12 +22,12 @@ class EMailModelTestCase(unittest.TestCase):
         drop_collections(EMailModelTestCase.raw_db)
         create_emails(self, EMailModelTestCase.raw_db)
 
-    def test_email_finding(self):
+    def test_email_finding(self) -> None:
         """Test retrieving a email into a EMail model"""
         email = EMail.objects.get(id=self.email1_json['_id']['$oid'])
         self.assertDictEqual(self.email1_json, json.loads(email.to_json()))
 
-    def test_email_save(self):
+    def test_email_save(self) -> None:
         """Test saving a EMail model"""
         # Can save a valid email
         self.email_in_test_json.pop('sender')
@@ -45,7 +45,7 @@ class EMailModelTestCase(unittest.TestCase):
         delattr(email_raising, 'content')
         self.assertRaises(ValidationError, lambda: email_raising.save())
 
-    def test_email_update(self):
+    def test_email_update(self) -> None:
         """Test updating a EMail model"""
         email = EMail(**self.email_in_test_json)
         email.sender = ObjectId(self.email1_json['sender']['$oid'])
@@ -61,7 +61,7 @@ class EMailModelTestCase(unittest.TestCase):
         email.content = self.email1_json.get('content')
         self.assertEqual(email.content, self.email1_json.get('content'))
 
-    def test_email_delete(self):
+    def test_email_delete(self) -> None:
         """Test deleting a EMail model"""
         email = EMail(**self.email_in_test_json)
         email.sender = ObjectId(self.email1_json['sender']['$oid'])
