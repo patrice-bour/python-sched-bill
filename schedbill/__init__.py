@@ -1,4 +1,4 @@
-from flask import Flask, g
+from flask import Flask, current_app, g
 import logging
 from . import config
 from . import errors
@@ -13,7 +13,6 @@ def create_app(config_class=config.DevelopmentConfiguration):
 
     app = Flask(__name__)
     app.config.from_object(config_class)
-
     with app.app_context():
         log.init()
         logger = logging.getLogger()
@@ -23,11 +22,11 @@ def create_app(config_class=config.DevelopmentConfiguration):
         get_db()
         logger.debug('Database connected')
         app_scheduler = get_scheduler()
-        app_scheduler.start()
+        # app_scheduler.start()
         logger.debug('Scheduler initialized and started')
         views.load()
         logger.debug('Routes initialized')
-        return app
+    return app
 
 
 if __name__ == '__main__':
