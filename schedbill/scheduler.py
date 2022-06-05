@@ -77,7 +77,7 @@ def setup_scheduler(max_threads: int = 25, job_coalesce: bool = False, misfire_g
 
     :param max_threads: maximum threads in a ThreadPoolExecutor
     :param job_coalesce: if False a same job won't be replayed several times if late
-    :param misfire_grace_time: the grace time for a misfired job
+    :param misfire_grace_time: the grace time (in seconds) to allow execution for a late job (None = run unconditionaly)
     :param timezone: the timezone of the scheduler
     :return: the configured scheduler
     """
