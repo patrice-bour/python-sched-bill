@@ -27,5 +27,5 @@ class Invoice(Document):
     reference = StringField(unique=True, required=True)
     periodicity = IntField(default=0)
     notify = BooleanField(default=False)
-    notifyAt = IntField(default=0)
+    notifyAt = IntField(default=-1)
 
