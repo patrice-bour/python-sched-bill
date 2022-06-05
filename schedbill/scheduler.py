@@ -130,4 +130,5 @@ def get_scheduler() -> BaseScheduler:
                 misfire_grace_time=current_app.config.get('SCHEDULER_MISFIRE_GRACE_TIME'),
                 timezone=current_app.config.get('SCHEDULER_TIMEZONE')
             )
+        app_scheduler.start()
     return app_scheduler
