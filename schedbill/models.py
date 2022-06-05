@@ -17,13 +17,15 @@ class EMail(Document):
     title = StringField(default="")
     content = StringField(required=True)
     sendAt = IntField(default=0)
-    periodicity = IntField(default=0)
 
 
 class Invoice(Document):
     """"""
     meta = {'collection': 'invoices'}
     sender = ReferenceField(User)
+    recipient = ReferenceField(User)
     reference = StringField(unique=True, required=True)
     periodicity = IntField(default=0)
     notify = BooleanField(default=False)
+    notifyAt = IntField(default=0)
+
