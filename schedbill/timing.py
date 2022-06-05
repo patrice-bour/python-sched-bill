@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 from dateutil.parser import parse
 from helpers import is_float
 import pytz
@@ -40,3 +40,27 @@ class TimeCalc:
         local_date = datetime.fromtimestamp(ts)
         target_tz = pytz.timezone(tz)
         return local_date.astimezone(target_tz)
+
+    @classmethod
+    def next_run_timestamp(cls, periodicity: int = 0) -> int:
+        """Compute a timestamp adding a periodicity in seconds to the current time
+
+        :param periodicity: the periodicity in seconds to add to the current time
+        :return: the computed timestamp
+        """
+        if periodicity > 0:
+            return int(datetime.now().timestamp() + periodicity)
+        else:
+            return 0
+
+    @classmethod
+    def today_trigger(cls, sec_from_midnight: int) -> int:
+        """Compute a timestamp adding a number of seconds to the current day starting at midnight
+
+        :param sec_from_midnight:the number of seconds to add
+        :return: the commuted timestamp
+        """
+        today_string = datetime.now().strftime("%Y-%m-%d 00:00:00")
+        today_ts = parse(today_string).timestamp()
+
+        return today_ts + sec_from_midnight
