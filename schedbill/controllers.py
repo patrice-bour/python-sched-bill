@@ -1,4 +1,4 @@
-from flask import current_app, g, request, jsonify
+from flask import current_app, g
 from mongoengine import ValidationError, DoesNotExist
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -161,6 +161,7 @@ class EMailController:
         if email.sendAt > 0:
             # replace_existing is set to true. This would then also update an existing job's schedule.
             raw_date = TimeCalc.timestamp_to_datetime(email.sendAt)
+            cls.unschedule_email(email)
             g.scheduler.add_job(
                 EMailController.send_email,
                 'date', run_date=raw_date,
@@ -251,3 +252,62 @@ class InvoiceController:
             raise InvalidId(f"Invalid ObjectId '{oid}'")
         invoice = Invoice.objects.get(id=oid)
         invoice.delete()
+
+    @classmethod
+    def generate_invoice(cls, oid: str) -> None:
+        """"""
+        invoice = cls.find(oid)
+        # scd = get_scheduler()
+        cls.unschedule_invoice(invoice)
+        logger.info(f"*** Generated invoice : {invoice.to_json()}")
+
+        if invoice.notify:
+            recipient = UserController.find(str(invoice.recipient.id))
+            if invoice.notifyAt >= 0:
+                send_at = TimeCalc.today_trigger(invoice.notifyAt)
+                email = EMailController.create_email(
+                    {
+                        'sender': str(invoice.sender.id),
+                        'recipient': recipient.emailAddress,
+                        'title': f"Your invoice {invoice.reference}",
+                        'content': 'Please find below our small invoice for this hard work.',
+                        'sendAt': send_at
+                    }
+                )
+            else:
+                email = EMailController.create_email(
+                    {
+                        'sender': str(invoice.sender.id),
+                        'recipient': recipient.emailAddress,
+                        'title': f"Your invoice {invoice.reference}",
+                        'content': 'Please find below our small invoice for this hard work.'
+                    }
+                )
+                EMailController.send_email(str(email.id))
+
+        if invoice.periodicity > 0:
+            raw_date = TimeCalc.timestamp_to_datetime(
+                TimeCalc.next_run_timestamp(invoice.periodicity)
+            )
+            cls.unschedule_invoice(invoice)
+            g.scheduler.add_job(
+            # scd.add_job(
+                InvoiceController.generate_invoice,
+                'date', run_date=raw_date,
+                args=[str(invoice.id)],
+                id=str(invoice.id),
+                replace_existing=True
+            )
+        else:
+            # any existing job's schedule has to be deleted.
+            cls.unschedule_invoice(invoice)
+
+    @classmethod
+    def unschedule_invoice(cls, invoice: Invoice) -> int:
+        """"""
+        # scd = get_scheduler()
+        if g.scheduler.get_job(str(invoice.id)) is not None:
+            g.scheduler.remove_job(str(invoice.id))
+            return 1
+        else:
+            return 0
