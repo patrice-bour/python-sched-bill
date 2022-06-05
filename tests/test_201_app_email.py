@@ -1,9 +1,9 @@
 import flask_unittest
-from schedbill import create_app, config, db
+from schedbill import create_app, config, db, scheduler
 from flask.testing import FlaskClient
 from fixtures.col import drop_collections
 from fixtures.emails import create_emails
-from flask import Flask
+from flask import Flask, g
 import mongoengine
 
 
@@ -13,6 +13,8 @@ class TestFlaskApp(flask_unittest.AppClientTestCase):
         with app.app_context():
             self.db = db.get_db()
             self.raw_db = mongoengine.connection.get_db()
+            self.scheduler = scheduler.get_scheduler()
+            self.scheduler.start()
             yield app
 
     def setUp(self, app: Flask, client: FlaskClient) -> None:

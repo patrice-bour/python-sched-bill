@@ -66,6 +66,7 @@ class UserController:
         user = User.objects(id=oid).modify(**updated_user)
         if not user:
             raise DoesNotExist(f"Can not find user with id '{oid}'")
+        user = User.objects.get(id=oid)
 
         return user
 
@@ -110,7 +111,7 @@ class EMailController:
 
         # Reckon sending time
         if raw_email.get('sendAt', 0) > 0:
-            raw_email['sendAt'] = TimeCalc.convert_to_store(raw_email['sendAt'])
+            raw_email['sendAt'] = TimeCalc.arg_to_timestamp(raw_email['sendAt'])
         email = EMail(**raw_email)
         email.save()
         cls.schedule_email(email)
@@ -129,11 +130,12 @@ class EMailController:
         if not ObjectId.is_valid(oid):
             raise InvalidId(f"Invalid ObjectId '{oid}'")
         # Reckon sending time
-        if updated_email.get('sendAt', 0) > 0:
-            updated_email['sendAt'] = TimeCalc.convert_to_store(updated_email['sendAt'])
+        if int(updated_email.get('sendAt', 0)) > 0:
+            updated_email['sendAt'] = TimeCalc.arg_to_timestamp(updated_email['sendAt'])
         email = EMail.objects(id=oid).modify(**updated_email)
         if not email:
             raise DoesNotExist(f"Can not find email with id '{oid}'")
+        email = EMail.objects.get(id=oid)
         cls.schedule_email(email)
 
         return email
@@ -148,7 +150,7 @@ class EMailController:
         if not ObjectId.is_valid(oid):
             raise InvalidId(f"Invalid ObjectId '{oid}'")
         email = EMail.objects.get(id=oid)
-        cls.schedule_email(email)
+        cls.unschedule_email(email)
 
         email.delete()
 
@@ -157,8 +159,14 @@ class EMailController:
         """"""
         if email.sendAt > 0:
             # replace_existing is set to true. This would then also update an existing job's schedule.
-            g.scheduler.add_job(EMailController.send_email, 'date', args=[str(email.id)], id=str(email.id),
-                                replace_existing=True)
+            raw_date = TimeCalc.timestamp_to_datetime(email.sendAt)
+            g.scheduler.add_job(
+                EMailController.send_email,
+                'date', run_date=raw_date,
+                args=[str(email.id)],
+                id=str(email.id),
+                replace_existing=True
+            )
             return 1
         else:
             # any existing job's schedule has to be deleted.
@@ -227,6 +235,7 @@ class InvoiceController:
         invoice = Invoice.objects(id=oid).modify(**updated_invoice)
         if not invoice:
             raise DoesNotExist(f"Can not find invoice with id '{oid}'")
+        invoice = Invoice.objects.get(id=oid)
 
         return invoice
 
